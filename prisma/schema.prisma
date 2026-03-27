@@ -1,0 +1,118 @@
+// Prisma schema definition for Digital Architect Platform
+// PostgreSQL database with comprehensive entity relationship modeling
+
+generator client {
+  provider             = "prisma-client-py"
+  recursive_type_depth = 5
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Entities table - Core business entities (companies, products, services)
+model Entity {
+  id              String   @id @default(uuid())
+  name            String
+  description     String?
+  vision          String?
+  industry        String
+  maturityScore   Float    @default(0.0) @map("maturity_score")
+  ownerId         String?  @map("owner_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  roadmapsAsSource      Roadmap[]              @relation("SourceEntity")
+  roadmapsAsTarget      Roadmap[]              @relation("TargetEntity")
+  relationshipsAsSource EntityRelationship[]   @relation("RelationshipSource")
+  relationshipsAsTarget EntityRelationship[]   @relation("RelationshipTarget")
+
+  // Indexes for performance
+  @@index([industry])
+  @@index([ownerId])
+  @@index([maturityScore])
+  @@index([createdAt])
+  @@map("entities")
+}
+
+// Roadmaps table - Strategic planning and transformation paths
+model Roadmap {
+  id                String   @id @default(uuid())
+  title             String
+  description       String?
+  sourceEntityId    String   @map("source_entity_id")
+  targetEntityId    String   @map("target_entity_id")
+  status            String   @default("draft")
+  priority          String   @default("medium")
+  estimatedDuration Int?     @map("estimated_duration")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  sourceEntity Entity      @relation("SourceEntity", fields: [sourceEntityId], references: [id], onDelete: Cascade)
+  targetEntity Entity      @relation("TargetEntity", fields: [targetEntityId], references: [id], onDelete: Cascade)
+  milestones   Milestone[]
+
+  // Indexes for performance
+  @@index([sourceEntityId])
+  @@index([targetEntityId])
+  @@index([status])
+  @@index([priority])
+  @@index([createdAt])
+  @@map("roadmaps")
+}
+
+// Milestones table - Key checkpoints in roadmap execution
+model Milestone {
+  id              String   @id @default(uuid())
+  roadmapId       String   @map("roadmap_id")
+  title           String
+  description     String?
+  status          String   @default("pending")
+  order           Int
+  dueDate         DateTime? @map("due_date")
+  completedAt     DateTime? @map("completed_at")
+  deliverables    String?
+  successCriteria String?  @map("success_criteria")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  roadmap Roadmap @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+
+  // Indexes for performance
+  @@index([roadmapId])
+  @@index([status])
+  @@index([order])
+  @@index([dueDate])
+  @@index([createdAt])
+  @@map("milestones")
+}
+
+// Entity relationships table - Connections between entities
+model EntityRelationship {
+  id               String   @id @default(uuid())
+  sourceEntityId   String   @map("source_entity_id")
+  targetEntityId   String   @map("target_entity_id")
+  relationshipType String   @map("relationship_type")
+  strength         Float    @default(0.5)
+  description      String?
+  metadata         String?
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  sourceEntity Entity @relation("RelationshipSource", fields: [sourceEntityId], references: [id], onDelete: Cascade)
+  targetEntity Entity @relation("RelationshipTarget", fields: [targetEntityId], references: [id], onDelete: Cascade)
+
+  // Indexes for performance
+  @@index([sourceEntityId])
+  @@index([targetEntityId])
+  @@index([relationshipType])
+  @@index([strength])
+  @@index([createdAt])
+  @@unique([sourceEntityId, targetEntityId, relationshipType])
+  @@map("entity_relationships")
+}
