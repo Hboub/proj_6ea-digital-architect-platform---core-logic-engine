@@ -1,0 +1,43 @@
+services:
+  # FastAPI Application for Testing
+  app-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: digital-architect-app-test
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-test:5432/test_digital_architect
+      - PINECONE_API_KEY=${PINECONE_API_KEY:-test-pinecone-api-key}
+      - PINECONE_ENVIRONMENT=${PINECONE_ENVIRONMENT:-us-west1-gcp}
+      - PINECONE_INDEX_NAME=${PINECONE_INDEX_NAME:-test-digital-architect-index}
+      - API_KEY=test-api-key
+      - LOG_LEVEL=info
+      - ENVIRONMENT=test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    networks:
+      - test-network
+    command: ["pytest", "-v", "--cov=src", "--cov-report=term-missing"]
+
+  # PostgreSQL Test Database
+  postgres-test:
+    image: postgres:16-alpine
+    container_name: digital-architect-postgres-test
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: test_digital_architect
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d test_digital_architect"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - test-network
+
+networks:
+  test-network:
+    driver: bridge

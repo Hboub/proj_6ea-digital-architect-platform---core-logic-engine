@@ -6,7 +6,13 @@
     "src/vector_db/embedding_service.py",
     "src/vector_db/query_service.py",
     "src/vector_db/setup_index.py",
-    "tests/test_vector_db.py"
+    "tests/test_vector_db.py",
+    "Dockerfile",
+    ".dockerignore",
+    "docker-compose.yml",
+    "docker-compose.test.yml",
+    "scripts/docker-entrypoint.sh",
+    "tests/test_docker.py"
   ],
   "files_modified": [],
   "decisions": [
@@ -41,11 +47,40 @@
     {
       "what": "Comprehensive test suite with 30+ test cases",
       "why": "Ensures reliability and catches regressions across all vector database operations"
+    },
+    {
+      "what": "Used multi-stage Dockerfile with builder and runtime stages",
+      "why": "Optimizes image size by separating build dependencies from runtime, following the specification requirements for production-grade containerization"
+    },
+    {
+      "what": "Created non-root user 'appuser' with UID 1000",
+      "why": "Security best practice to run containers as non-root user, preventing potential privilege escalation"
+    },
+    {
+      "what": "Implemented comprehensive docker-entrypoint.sh script with database migration handling",
+      "why": "Ensures database is ready and migrations are applied before application starts, with proper error handling and logging"
+    },
+    {
+      "what": "Separated development and test Docker Compose configurations",
+      "why": "Allows different configurations for local development vs testing, with test environment using tmpfs for database to improve performance"
+    },
+    {
+      "what": "Included health check instructions in Dockerfile and docker-compose files",
+      "why": "Enables container orchestrators to monitor application health and restart unhealthy containers automatically"
+    },
+    {
+      "what": "Used PostgreSQL 16 Alpine image for database service",
+      "why": "Provides lightweight, production-ready PostgreSQL with minimal attack surface"
+    },
+    {
+      "what": "Created integration tests for Docker functionality",
+      "why": "Verifies container startup, health checks, environment variable loading, and service connectivity"
     }
   ],
   "tools_used": [
     "Read",
     "Write",
-    "Bash"
+    "Bash",
+    "TodoWrite"
   ]
 }
