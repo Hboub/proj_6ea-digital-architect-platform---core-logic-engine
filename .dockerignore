@@ -1,0 +1,62 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+coverage/
+tests/
+*.test
+
+# Documentation
+docs/
+*.md
+README*
+LICENSE
+
+# Development files
+.env
+.env.local
+.env.*.local
+docker-compose*.yml
+Dockerfile*
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Task files
+arvad_task_files/
+.arvad_session_report.json
+
+# Pre-commit
+.pre-commit-config.yaml
+
+# Ruff cache
+.ruff_cache/
+
+# Mypy cache
+.mypy_cache/
