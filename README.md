@@ -1,0 +1,2 @@
+# proj_6ea-digital-architect-platform---core-logic-engine
+A sophisticated business intelligence platform that manages complex business entities and calculates strategic relationships through AI-powered synergy scoring. The system uses vector embeddings to determine entity compatibility, tracks business maturity progression over 36-month roadmaps, and provides data-driven insights for strategic decision ma
